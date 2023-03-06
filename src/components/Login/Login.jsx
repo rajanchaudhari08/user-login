@@ -1,16 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import styles from "./Login.module.css";
 import Card from "../UserInterface/Card/Card";
 import Button from "../UserInterface/Button/Button";
 
+const reducerInputEmail = (state, action) => {
+  if (action.type === "INPUT_EMAIL") {
+    return {
+      value: action.inputvalue,
+      isValid: action.inputvalue.includes("@"),
+    };
+  }
+  if (action.type === "INPUT_BLUR") {
+    return {
+      value: state.value,
+      isValid: state.value.includes("@"),
+    };
+  }
+  return {
+    value: "",
+    isValid: false,
+  };
+};
+
 const Login = (properties) => {
-  const [inputEmail, setInputEmail] = useState("");
-  const [emailIsValid, setEmailIsValid] = useState();
+  // const [inputEmail, setInputEmail] = useState("");
+  // const [emailIsValid, setEmailIsValid] = useState();
 
   const [inputPassword, setInputPassword] = useState("");
   const [passwordIsValid, setPasswordIsValid] = useState();
 
   const [formIsValid, setFormIsValid] = useState(false);
+
+  const [stateInputEmail, dispatchInputEmail] = useReducer(reducerInputEmail, {
+    value: "",
+    isValid: null,
+  });
 
   /* For reference */
   /* 
@@ -21,10 +45,8 @@ const Login = (properties) => {
     };
   }, []);
   */
-
+  /*
   useEffect(() => {
-    /* Sending HTTP Request after specific time interval - Debounce Function*/
-
     const timeoutIdentifier = setTimeout(() => {
       // console.log("HTTP Request sent.");
       setFormIsValid(
@@ -34,24 +56,33 @@ const Login = (properties) => {
       );
     }, 1000);
 
-    /* Cleanup Function */
-
     return () => {
-      // console.log("Cleanup Function");
       clearTimeout(timeoutIdentifier);
     };
   }, [inputEmail, inputPassword]);
+  */
 
   const emailChangeHandler = (event) => {
-    setInputEmail(event.target.value);
+    // setInputEmail(event.target.value);
+    dispatchInputEmail({ type: "INPUT_EMAIL", inputvalue: event.target.value });
+
+    setFormIsValid(
+      event.target.value.includes("@") &&
+        event.target.value.includes(".") &&
+        inputPassword.trim().length > 7
+    );
   };
 
   const passwordChangeHandler = (event) => {
     setInputPassword(event.target.value);
+    setFormIsValid(
+      stateInputEmail.isValid && event.target.value.trim().length > 7
+    );
   };
 
   const validateEmailHandler = () => {
-    setEmailIsValid(inputEmail.includes("@"));
+    // setEmailIsValid(stateInputEmail.isValid);
+    dispatchInputEmail({ type: "INPUT_BLUR" });
   };
 
   const validatePasswordHandler = () => {
@@ -60,7 +91,7 @@ const Login = (properties) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    properties.onLogin(inputEmail, inputPassword);
+    properties.onLogin(stateInputEmail.value, inputPassword);
     // console.log(inputEmail, inputPassword);
   };
 
@@ -69,14 +100,14 @@ const Login = (properties) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${styles.control} ${
-            emailIsValid === false ? styles.invalid : ""
+            stateInputEmail.isValid === false ? styles.invalid : ""
           }`}
         >
           <label htmlFor="email">E-Mail</label>
           <input
             type="email"
             id="email"
-            value={inputEmail}
+            value={stateInputEmail.value}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
