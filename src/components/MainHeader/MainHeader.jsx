@@ -5,10 +5,7 @@ const MainHeader = (properties) => {
   return (
     <header className={styles["main-header"]}>
       <h1>User Login</h1>
-      <Navigation
-        isLoggedIn={properties.isAuthenticated}
-        onLogout={properties.onLogout}
-      />
+      <Navigation onLogout={properties.onLogout} />
     </header>
   );
 };
