@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useContext } from "react";
 import styles from "./Login.module.css";
 import Card from "../UserInterface/Card/Card";
 import Button from "../UserInterface/Button/Button";
+import AuthenticationContext from "../../../AuthenticationContext/authentication-context";
 
 const reducerInputEmail = (state, action) => {
   if (action.type === "INPUT_EMAIL") {
@@ -67,6 +68,8 @@ const Login = (properties) => {
   const { isValid: isValidEmail } = stateInputEmail;
   const { isValid: isValidPassword } = stateInputPassword;
 
+  const loginAuthenticationContext = useContext(AuthenticationContext);
+
   /* For reference */
   /* 
   useEffect(() => {
@@ -126,7 +129,10 @@ const Login = (properties) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    properties.onLogin(stateInputEmail.value, stateInputPassword.value);
+    loginAuthenticationContext.onLogin(
+      stateInputEmail.value,
+      stateInputPassword.value
+    );
     // console.log(inputEmail, inputPassword);
   };
 
