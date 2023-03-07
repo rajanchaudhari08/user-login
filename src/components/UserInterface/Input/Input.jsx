@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useRef, useImperativeHandle } from "react";
 import styles from "./Input.module.css";
 
-const Input = (properties) => {
+const Input = React.forwardRef((properties, ref) => {
+  const refInput = useRef();
+  const activateFocus = () => {
+    refInput.current.focus();
+  };
+  useImperativeHandle(ref, () => {
+    return {
+      focus: activateFocus,
+    };
+  });
   return (
     <React.Fragment>
       <div
@@ -16,10 +25,11 @@ const Input = (properties) => {
           value={properties.value}
           onChange={properties.onChange}
           onBlur={properties.onBlur}
+          ref={refInput}
         />
       </div>
     </React.Fragment>
   );
-};
+});
 
 export default Input;
